@@ -1,0 +1,57 @@
+
+12      pdata:userProfile
+
+51      definition:activity:sampling
+
+
+97      setting:analysis
+
+
+400     definition:variable
+401     definition:variable:continuous
+421     definition:variable:metric
+410     definition:variable:design
+411     definition:variable:design:continuous
+480     definition:variable:sampling
+481     definition:variable:sampling:continuous
+
+500     definition:parameterization
+501     definition:parameterization:design
+
+550     definition:space
+551     definition:space:abstract
+553     definition:space:sampling
+555     definition:space:design
+560     definition:space:performance
+
+721     reference:standard:analysis
+
+750     reference:metric:performance
+751     reference:metric:performance:continuous
+
+840     protocol:calibration
+
+1000    definition:asset
+1100    definition:asset:design
+
+
+8000    definition:problem
+8005    definition:problem:optimization
+8010    definition:problem:design
+8015    definition:problem:designOptimization
+8070    definition:problem:generativeModeling
+8071    definition:problem:generativeModeling:conditional
+8075    definition:problem:generativeDesign
+8076    definition:problem:generativeDesign:conditional
+
+8800    definition:campaign
+8900    definition:campaign:generativeDesign:conditional
+
+9100    specification:dataset
+
+
+10000   dataset
+11000   datapack
+
+
+721750  multiref:metric:performance:standard:analysis
