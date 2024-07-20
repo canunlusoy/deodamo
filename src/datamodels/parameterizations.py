@@ -23,7 +23,7 @@ class Parameterization(ProgramData):
 
 
 @dataclass
-class DesignParameterization(ProgramData):
+class DesignParameterization(Parameterization):
 
     name: str
 
