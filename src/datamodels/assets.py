@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from utils.iox import ProgramData
 
 
-@dataclass
+@dataclass(frozen=True)
 class Asset(ProgramData):
 
     name: str
@@ -17,7 +17,7 @@ class Asset(ProgramData):
     _used_classes: ClassVar[list[Type['ProgramData']]] = []
 
 
-@dataclass
+@dataclass(frozen=True)
 class DesignAsset(Asset):
 
     _data_type_str: ClassVar[str] = 'definition:asset:design'
