@@ -20,3 +20,5 @@ class SamplingSpacePoint(Point):
     pass
 
 
+class AbstractSpacePoint(Point):
+    pass
