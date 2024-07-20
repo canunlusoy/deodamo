@@ -57,6 +57,19 @@ class ContinuousDesignVariable(DesignVariable, ContinuousVariable):
     def __repr__(self):
         return f'{self.name}'
 
+    @classmethod
+    def from_dict(cls, dct: dict) -> 'ProgramData':
+        field_data = {}
+        for key, val in dct.items():
+            if key in cls._save_fields:
+                field_data[key] = val
+
+        # Forcibly type cast to tuple - in case the data is coming from an offline file, the initial tuple would have been reloaded
+        # as a list since JSON does not have a tuple type
+        field_data['typical_range'] = tuple(field_data['typical_range'])
+
+        return cls(**field_data)
+
 
 @dataclass(frozen=True)
 class SamplingVariable(Variable):
@@ -89,3 +102,16 @@ class ContinuousSamplingVariable(SamplingVariable, ContinuousVariable):
             message = 'Sampling variable name cannot be identical to the source design variable.'
             raise ValueError(message)
         return ContinuousSamplingVariable(new_name, typical_range=cts_dvar.typical_range)
+
+    @classmethod
+    def from_dict(cls, dct: dict) -> 'ProgramData':
+        field_data = {}
+        for key, val in dct.items():
+            if key in cls._save_fields:
+                field_data[key] = val
+
+        # Forcibly type cast to tuple - in case the data is coming from an offline file, the initial tuple would have been reloaded
+        # as a list since JSON does not have a tuple type
+        field_data['typical_range'] = tuple(field_data['typical_range'])
+
+        return cls(**field_data)
