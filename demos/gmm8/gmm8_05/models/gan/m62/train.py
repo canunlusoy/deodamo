@@ -63,13 +63,6 @@ if __name__ == '__main__':
         device=device
     )
 
-    # for index in [1, 4, 7, 10, 13]:
-    #     model.generator.network.insert(index, torch.nn.BatchNorm1d(1024))
-    # model.generator.network.pop(16)
-    #
-    # model.generator.network.insert(0, torch.nn.Dropout())
-    # model.discriminator.network.insert(0, torch.nn.Dropout())
-
     val_bundle = GANValidatorBundle(model, dev_ds_validate)
     loss_plotter = TrainingProgressPlotter(model, validators=val_bundle.validators)
     gen_plotter = GMM8GenerationPlotter(model)
@@ -81,9 +74,7 @@ if __name__ == '__main__':
 
     model.event_handler.subscribe(event_50_epochs, val_bundle.d_validator.calculate_validation_loss)
     model.event_handler.subscribe(event_50_epochs, val_bundle.g_validator.calculate_validation_loss)
-
     model.event_handler.subscribe(event_50_epochs, loss_plotter.generate_progress_plot)
-
     model.event_handler.subscribe(event_50_epochs, gen_plotter.plot)
 
     model.train(dev_ds_train, epochs=n_epochs)
