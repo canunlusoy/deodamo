@@ -1,9 +1,10 @@
-from inspect import signature, getsource
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Type
 from dataclasses import dataclass
 
+import numpy as np
 from sympy.parsing.sympy_parser import parse_expr
+from scipy.interpolate import RegularGridInterpolator
 
 from src.utils.iox import ProgramData
 from src.datamodels.points import Point, AbstractSpacePoint
@@ -14,7 +15,7 @@ from utils.programming import is_lambda_function
 
 class S2SMapper:
 
-    def map(self, point: Point) -> Any:
+    def map(self, point: Point, dimension_index: int, *args, **kwargs) -> Any:
         return None
 
     def to_dict(self) -> dict:
@@ -22,11 +23,11 @@ class S2SMapper:
 
 
 @dataclass
-class SympyExpression(ProgramData, S2SMapper):
+class SympyExpressionMapper(ProgramData, S2SMapper):
 
     raw_expression: str
 
-    _data_type_str: ClassVar[str] = 'sympy_expression'
+    _data_type_str: ClassVar[str] = 'sympy_expression_mapper'
     _data_type_key: ClassVar[int] = '8000'
 
     _save_fields: ClassVar[list[str]] = ['raw_expression']
@@ -70,14 +71,15 @@ class FixedRangeLinearMapper(ProgramData, S2SMapper):
 
     def map(self,
             point: AbstractSpacePoint,
-            dimension_index: int = None
+            dimension_index: int,
+            *args, **kwargs
             ) -> float:
 
         if dimension_index is None:
             message = f'Index of the dimension in the abstract space point must be provided!'
             raise ValueError(message)
 
-        raw_value = point[dimension_index]
+        raw_value = point[str(dimension_index)]
 
         lower, upper = self.fixed_range
         mapped_value = lower + (upper - lower) * raw_value
@@ -97,12 +99,28 @@ class FixedRangeLinearMapper(ProgramData, S2SMapper):
 
 
 @dataclass
-class TabulatedRangeLinearMapper(ProgramData, S2SMapper):
+class BivariateTabulatedRangeLinearMapper(ProgramData, S2SMapper):
+    """
+    Maps value of a variable from an abstract space (where value is between 0 and 1) to a sampling space (where value is a real number).
+    The mapping is linear.
+
+    Lower and upper bounds of the variable value in the target space is given by bivariate tables.
+    (One table for lower bound, another table for upper bound)
+
+    "Bivariate table" here means that the rows and columns of the table correspond to values of other sampling space variables.
+    """
 
     range_lower_table_csv_fp: str | Path
+    """Filepath to the table listing lower bounds of the variable value"""
+
     range_upper_table_csv_fp: str | Path
+    """Filepath to the table listing upper bounds of the variable value"""
+
     table_rows_var: SamplingVariable
+    """Rows of the tables correspond to values of this sampling variable"""
+
     table_cols_var: SamplingVariable
+    """Columns of the tables correspond to values of this sampling variable"""
 
     _data_type_str: ClassVar[str] = 'tabulated_range_linear_mapper'
     _data_type_key: ClassVar[int] = '8007'
@@ -114,10 +132,36 @@ class TabulatedRangeLinearMapper(ProgramData, S2SMapper):
         self.range_lower_table_csv_fp = Path(self.range_lower_table_csv_fp)
         self.range_upper_table_csv_fp = Path(self.range_upper_table_csv_fp)
 
+        range_lower_table_raw = np.genfromtxt(self.range_lower_table_csv_fp, delimiter=',')
+        range_upper_table_raw = np.genfromtxt(self.range_upper_table_csv_fp, delimiter=',')
+        
+        self.range_lower_table_row_var_vals = range_lower_table_raw[0, 1:]
+        self.range_lower_table_col_var_vals = range_lower_table_raw[1:, 0]
+        self.range_lower_table = range_lower_table_raw[1:, 1:]
+
+        self.range_upper_table_row_var_vals = range_upper_table_raw[0, 1:]
+        self.range_upper_table_col_var_vals = range_upper_table_raw[1:, 0]
+        self.range_upper_table = range_upper_table_raw[1:, 1:]
+        
+        self.range_lower_interpolator = RegularGridInterpolator(
+            (self.range_lower_table_row_var_vals, self.range_lower_table_col_var_vals),
+            self.range_lower_table,
+            method='linear',
+            bounds_error=True
+        )
+
+        self.range_upper_interpolator = RegularGridInterpolator(
+            (self.range_upper_table_row_var_vals, self.range_upper_table_col_var_vals),
+            self.range_upper_table,
+            method='linear',
+            bounds_error=True
+        )
+
     def map(self,
             point: AbstractSpacePoint,
-            dimension_index: int = None,
-            dependee_sampling_var_values: dict[SamplingVariable, float] = None
+            dimension_index: int,
+            dependee_sampling_var_values: dict[SamplingVariable, float] = None,
+            *args, **kwargs
             ) -> Any:
 
         if dimension_index is None:
@@ -128,7 +172,17 @@ class TabulatedRangeLinearMapper(ProgramData, S2SMapper):
             message = f'Values of sampling variables representing table row and columns must be provided! Some are missing.'
             raise KeyError(message)
 
-        raw_value = point[dimension_index]
+        raw_value = point[str(dimension_index)]
+
+        row_var_val = dependee_sampling_var_values[self.table_rows_var]
+        col_var_val = dependee_sampling_var_values[self.table_cols_var]
+
+        range_lower_bound = self.range_lower_interpolator((row_var_val, col_var_val))
+        range_upper_bound = self.range_upper_interpolator((row_var_val, col_var_val))
+
+        mapped_value = range_lower_bound + (range_upper_bound - range_lower_bound) * raw_value
+
+        return mapped_value
 
     def _get_raw_data(self):
         dct = {key: getattr(self, key) for key in self._save_fields}

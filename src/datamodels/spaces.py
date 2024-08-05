@@ -2,15 +2,18 @@ from copy import deepcopy
 from typing import Callable, ClassVar, Type
 from dataclasses import dataclass, field
 
+import numpy as np
 from scipy.stats.qmc import LatinHypercube
 
 from src.datamodels.assets import Asset
-from src.datamodels.mappers import S2SMapper, SympyExpression
+from src.datamodels.mappers import S2SMapper, SympyExpressionMapper
 from src.datamodels.points import DesignSpacePoint, SamplingSpacePoint, AbstractSpacePoint
 from src.datamodels.analyses import PerformanceMetric
 from src.datamodels.variables import (
     Variable, ContinuousVariable, DesignVariable, SamplingVariable, ContinuousSamplingVariable, ContinuousDesignVariable
 )
+from src.datamodels.datasets import Dataset, DatasetStandard, DatasetSpecification
+from src.datamodels.parameterizations import Parameterization
 
 from utils.iox import ProgramData
 from utils.programming import is_lambda_function
@@ -75,7 +78,7 @@ class SamplingSpace(Space):
     _used_classes: ClassVar[list[Type['ProgramData']]] = [
         SamplingVariable, ContinuousSamplingVariable,
         DesignVariable, ContinuousDesignVariable, DesignSpace,
-        SympyExpression
+        SympyExpressionMapper
     ]
 
     def __post_init__(self):
@@ -97,13 +100,70 @@ class SamplingSpace(Space):
 
         # Check if mappers to design space variables use sampling space dimensions
         for dvar, mapper in self.mappers_to_design_vars.items():
-            if isinstance(mapper, SympyExpression):
+            if isinstance(mapper, SympyExpressionMapper):
                 dependent_svar_names = mapper.variables
                 if not all(svar_name in [var.name for var in self.variables] for svar_name in dependent_svar_names):
                     message = (f'The mapper for design space variable "{dvar.name}" uses variables that are not sampling space dimensions. '
                                f'\nMapper uses variables: {", ".join(mapper.variables)}'
                                f'\nSampling space variables are: {", ".join([var.name for var in self.variables])}')
                     raise KeyError(message)
+                
+    def map_ssps_to_dsps(self,
+                         ssps: Dataset,
+                         dsp_ds_id: str,
+                         ) -> Dataset:
+
+        # Convert sampling space point (SSP) array into list of SSP objects (list of dicts)
+        ssps_as_points = [
+            SamplingSpacePoint(
+                {str(col): ssps.data[row, col] for row, col in range(ssps.data.shape[0]), range(ssps.data.shape[1])}
+            )
+        ]
+
+        dsps = []  # list to store sampling space points (SSPs)
+
+        for ssp in ssps_as_points:
+            dsp = DesignSpacePoint()
+
+            for dvar_index, dvar in enumerate(self.associated_design_space.variables):
+                dvar_mapper = self.mappers_to_design_vars[dvar]
+
+                # Get value of design variable by mapping value of an SSP dimension
+                dvar_value = dvar_mapper.map(ssp,
+                                             dimension_index=dvar_index,  # this dimension of the ASP will be mapped
+
+                                             # Some mappers use the following argument - mapped value may depend on
+                                             # values of other sampling variables. Provide the SSP dict containing
+                                             # currently available values of sampling variables
+                                             dependee_sampling_var_values=dsp
+                                             )
+
+                dsp[dvar.name] = dvar_value
+
+            dsps.append(dsp)
+
+        design_space_asset = Asset(name='DesignSpace')
+        parameterization = Parameterization(
+            name='DesignSpaceParameterization',
+            parameterized_asset=design_space_asset,
+            parameters=self.associated_design_space.variables
+        )
+
+        spec = DatasetSpecification(columns=self.associated_design_space.variables)
+        std = DatasetStandard(spec, columns_standards=[parameterization for var in self.associated_design_space.variables])
+
+        dsp_ds_data_raw = [
+            [dsp[dvar.name] for dvar in self.associated_design_space.variables] for dsp in dsps
+        ]
+        dsp_ds_data = np.array(dsp_ds_data_raw)
+
+        dsp_ds = Dataset(
+            id=dsp_ds_id,
+            standard=std,
+            data=dsp_ds_data
+        )
+
+        return dsp_ds
 
     def map_ssp_to_dsp(self, ssp: SamplingSpacePoint) -> DesignSpacePoint:
         dsp = DesignSpacePoint()
@@ -154,7 +214,7 @@ class AbstractSpace(Space):
 
         # Check if mappers to sampling space variables use sampling space dimensions
         for dvar, mapper in self.mappers_to_design_vars.items():
-            if isinstance(mapper, SympyExpression):
+            if isinstance(mapper, SympyExpressionMapper):
                 dependent_svar_names = mapper.variables
                 if not all(svar_name in [var.name for var in self.variables] for svar_name in dependent_svar_names):
                     message = (f'The mapper for design space variable "{dvar.name}" uses variables that are not sampling space dimensions. '
@@ -165,6 +225,63 @@ class AbstractSpace(Space):
     @property
     def n_dims(self) -> int:
         return self.associated_sampling_space.n_dims
+
+    def map_asps_to_ssps(self,
+                         asps: Dataset,
+                         ssp_ds_id: str,
+                         ) -> Dataset:
+
+        # Convert abstract sample point (ASP) array into list of ASP objects (list of dicts)
+        asps_as_points = [
+            AbstractSpacePoint(
+                {str(col): asps.data[row, col] for row, col in range(asps.data.shape[0]), range(asps.data.shape[1])}
+            )
+        ]
+
+        ssps = []  # list to store sampling space points (SSPs)
+
+        for asp in asps_as_points:
+            ssp = SamplingSpacePoint()
+
+            for svar_index, svar in enumerate(self.associated_sampling_space.variables):
+                svar_mapper = self.mappers_to_sampling_vars[svar]
+
+                # Get value of sampling variable by mapping value of an ASP dimension
+                svar_value = svar_mapper.map(asp,
+                                             dimension_index=svar_index,  # this dimension of the ASP will be mapped
+
+                                             # Some mappers use the following argument - mapped value may depend on
+                                             # values of other sampling variables. Provide the SSP dict containing
+                                             # currently available values of sampling variables
+                                             dependee_sampling_var_values=ssp
+                                             )
+
+                ssp[svar.name] = svar_value
+
+            ssps.append(ssp)
+
+        sampling_space = Asset(name='SamplingSpace')
+        parameterization = Parameterization(
+            name='SamplingSpaceParameterization',
+            parameterized_asset=sampling_space,
+            parameters=self.associated_sampling_space.variables
+        )
+
+        spec = DatasetSpecification(columns=self.associated_sampling_space.variables)
+        std = DatasetStandard(spec, columns_standards=[parameterization for var in self.associated_sampling_space.variables])
+
+        ssp_ds_data_raw = [
+            [ssp[svar.name] for svar in self.associated_sampling_space.variables] for ssp in ssps
+        ]
+        ssp_ds_data = np.array(ssp_ds_data_raw)
+
+        ssp_ds = Dataset(
+            id=ssp_ds_id,
+            standard=std,
+            data=ssp_ds_data
+        )
+
+        return ssp_ds
 
     def map_asp_to_ssp(self, asp: AbstractSpacePoint) -> SamplingSpacePoint:
         ssp = SamplingSpacePoint()
@@ -191,16 +308,32 @@ class AbstractSpace(Space):
         field_data['mappers_to_design_vars'] = {dvars_by_name[dvar_name]: mapper for dvar_name, mapper in field_data['mappers_to_design_vars'].items()}
         return cls(**field_data)
 
-    def generate_points(self, n_points: int) -> list[AbstractSpacePoint]:
+    def generate_dataset(self,
+                         n_points: int,
+                         id: str,
+                         ):
         lh = LatinHypercube(d=self.n_dims)
         raw_points = lh.random(n=n_points)
-        points = [
-            AbstractSpacePoint(
-                {col: raw_points[row, col] for row, col in range(raw_points.shape[0]), range(raw_points.shape[1])}
-            )
-        ]
-        return points
 
+        abstract_space = Asset(name='AbstractSpace')
+        as_dims = [Variable(f'{n}') for n in range(self.n_dims)]
+
+        parameterization = Parameterization(
+            name='AbstractSpaceParameterization',
+            parameterized_asset=abstract_space,
+            parameters=as_dims
+        )
+
+        spec = DatasetSpecification(columns=as_dims)
+        std = DatasetStandard(spec, columns_standards=[parameterization for dim in as_dims])
+
+        ds = Dataset(
+            id=id,
+            standard=std,
+            data=raw_points
+        )
+
+        return ds
 
 @dataclass(frozen=True)
 class PerformanceSpace(Space):
