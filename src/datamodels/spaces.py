@@ -116,7 +116,7 @@ class SamplingSpace(Space):
         # Convert sampling space point (SSP) array into list of SSP objects (list of dicts)
         ssps_as_points = [
             SamplingSpacePoint(
-                {str(col): ssps.data[row, col] for row, col in range(ssps.data.shape[0]), range(ssps.data.shape[1])}
+                {str(col): ssps.data[row, col] for row, col in zip(range(ssps.data.shape[0]), range(ssps.data.shape[1]))}
             )
         ]
 
@@ -234,7 +234,7 @@ class AbstractSpace(Space):
         # Convert abstract sample point (ASP) array into list of ASP objects (list of dicts)
         asps_as_points = [
             AbstractSpacePoint(
-                {str(col): asps.data[row, col] for row, col in range(asps.data.shape[0]), range(asps.data.shape[1])}
+                {str(col): asps.data[row, col] for row, col in zip(range(asps.data.shape[0]), range(asps.data.shape[1]))}
             )
         ]
 

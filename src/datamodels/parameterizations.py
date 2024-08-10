@@ -2,7 +2,6 @@ from typing import ClassVar, Type
 from dataclasses import dataclass
 
 from src.datamodels.assets import Asset, DesignAsset
-from src.datamodels.spaces import DesignSpace
 from src.datamodels.variables import Variable, DesignVariable
 
 from utils.iox import ProgramData
@@ -38,9 +37,5 @@ class DesignParameterization(Parameterization):
 
     _used_classes: ClassVar[list[Type['ProgramData']]] = [DesignAsset, DesignVariable]
 
-    def get_design_space_from_parameters(self) -> DesignSpace:
-        return DesignSpace(variables=self.parameters)
-
     def __repr__(self) -> str:
         return f'{self.name} ({len(self.parameters)} parameters describing "{self.parameterized_asset.name}")'
-
