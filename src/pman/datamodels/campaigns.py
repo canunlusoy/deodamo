@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 
 from utils.iox import ProgramData
 
-from src.datamodels.assets import DesignAsset
-from src.datamodels.parameterizations import DesignParameterization
-from src.pman.datamodels.problems import Problem, ConditionalGenerativeDesignProblem
+from datamodels.assets import DesignAsset
+from datamodels.parameterizations import DesignParameterization
+from pman.datamodels.problems import Problem, ConditionalGenerativeDesignProblem
 
 
 @dataclass

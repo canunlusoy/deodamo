@@ -10,10 +10,10 @@ import torch.nn.functional as F
 import torch.nn as nn
 from torch import Tensor
 
-from src.mdev.utilities import activation_fcns_by_key, optimizers_by_key, data_container_row_index, NoiseGenerator, MDevDataset, get_fc_network
-from src.mdev.generative.base import GenerativeModel, ConditionalGenerativeModel, Validator
-from src.mdev.logger import LOG_LEVEL_NAME_VALIDATION, LOG_LEVEL_VALIDATION
-from src.mdev.archspec import NetworkSpecification, Linear, ActivationFunction
+from mdev.utilities import activation_fcns_by_key, optimizers_by_key, data_container_row_index, NoiseGenerator, MDevDataset, get_fc_network
+from mdev.generative.base import GenerativeModel, ConditionalGenerativeModel, Validator
+from mdev.logger import LOG_LEVEL_NAME_VALIDATION, LOG_LEVEL_VALIDATION
+from mdev.archspec import NetworkSpecification, Linear, ActivationFunction
 
 
 logger = logging.getLogger(__name__)

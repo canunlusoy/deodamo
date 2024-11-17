@@ -1,8 +1,8 @@
-from src.datamodels.assets import DesignAsset
-from src.datamodels.analyses import PerformanceMetric, AnalysisStandard
-from src.datamodels.parameterizations import DesignParameterization
+from datamodels.assets import DesignAsset
+from datamodels.analyses import PerformanceMetric, AnalysisStandard
+from datamodels.parameterizations import DesignParameterization
 
-from src.pman.datamodels.campaigns import ConditionalGenerativeDesignCampaign
+from pman.datamodels.campaigns import ConditionalGenerativeDesignCampaign
 
 class Briefcase:
 
@@ -35,6 +35,6 @@ class ProjectLibrary:
 
     def __init__(self):
 
-        self.campaigns: list[]
+        self.campaigns: list
 
 

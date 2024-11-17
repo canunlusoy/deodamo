@@ -1,12 +1,10 @@
 from pathlib import Path
 
-import torch
-
-from src.pman.datamodels.problems import GenerativeModelingProblem
-from src.datamodels.datasets import Dataset
-from src.mdev.utilities import MDevDataset
-from src.mdev.generative.gan import GAN
-from src.mdev.archspec import *
+from pman.datamodels.problems import GenerativeModelingProblem
+from datamodels.datasets import Dataset
+from mdev.utilities import MDevDataset
+from mdev.generative.gan import GAN
+from mdev.archspec import *
 
 
 wd = Path(__file__).parent

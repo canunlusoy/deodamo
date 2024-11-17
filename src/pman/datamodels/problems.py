@@ -1,11 +1,11 @@
 from typing import ClassVar, Type
 from dataclasses import dataclass, field
 
-from src.datamodels.datasets import DatasetSpecification
-from src.datamodels.spaces import Space, DesignSpace
-from src.datamodels.variables import Variable
-from src.datamodels.parameterizations import DesignParameterization
-from src.datamodels.assets import DesignAsset
+from datamodels.datasets import DatasetSpecification
+from datamodels.spaces import Space, DesignSpace
+from datamodels.variables import Variable
+from datamodels.parameterizations import DesignParameterization
+from datamodels.assets import DesignAsset
 
 from utils.iox import ProgramData
 

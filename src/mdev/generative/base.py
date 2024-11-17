@@ -11,15 +11,15 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from src.utils.iox import ProgramData
-from src.utils.programming import EventHandler
-from src.datamodels.variables import Variable
-from src.datamodels.spaces import Space
-from src.pman.datamodels.problems import GenerativeDesignProblem, ConditionalGenerativeDesignProblem, GenerativeModelingProblem
+from utils.iox import ProgramData
+from utils.programming import EventHandler
+from datamodels.variables import Variable
+from datamodels.spaces import Space
+from pman.datamodels.problems import GenerativeDesignProblem, ConditionalGenerativeDesignProblem, GenerativeModelingProblem
 
-from src.mdev.utilities import data_container_row_index, MDevDataset, NormalizedVariable
-from src.mdev.archspec import LayerSpecification, get_layer_spec_from_dct, ModuleLinkedSpecification
-from src.mdev.logger import LOG_LEVEL_TRAINING
+from mdev.utilities import data_container_row_index, MDevDataset, NormalizedVariable
+from mdev.archspec import LayerSpecification, get_layer_spec_from_dct, ModuleLinkedSpecification
+from mdev.logger import LOG_LEVEL_TRAINING
 
 
 logger = logging.getLogger(__name__)
@@ -660,6 +660,8 @@ class TrainingProgressPlotter:
     PREFIX_TRAINING_LOSS = 'Training'
     PREFIX_VALIDATION_LOSS = 'Validation'
 
+    plotly_template = 'plotly_white'
+
     def __init__(self,
                  model: GenerativeModel,
                  validators: Iterable[Validator]):
@@ -703,7 +705,8 @@ class TrainingProgressPlotter:
             y=self.KEY_LOSS_VALUE,
             color=self.KEY_LOSS_TYPE,
             title=f'{self.model.name} ({self.model.MODEL_TYPE_ABBREVIATION}) at Epoch {epoch_index}',
-            markers=True
+            markers=True,
+            template=self.plotly_template,
         )
 
         fn = f'{self.model.name}_losses.html'
@@ -722,8 +725,3 @@ class TrainingProgressPlotter:
             fp_old_temp.unlink(missing_ok=True)
         except PermissionError:
             return
-
-
-if __name__ == '__main__':
-
-    print(5)

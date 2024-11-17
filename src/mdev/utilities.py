@@ -9,13 +9,13 @@ from torch.optim import Optimizer, Adam
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split as _sklearn_train_test_split
 
-from src.utils.iox import ProgramData
-from src.datamodels.assets import Asset
-from src.datamodels.datasets import DataContainer, Dataset as DManDataset, DatasetStandard, DatasetSpecification
-from src.datamodels.variables import Variable
-from src.datamodels.spaces import Space
-from src.datamodels.parameterizations import Parameterization
-from src.pman.datamodels.problems import GenerativeModelingProblem
+from utils.iox import ProgramData
+from datamodels.assets import Asset
+from datamodels.datasets import DataContainer, Dataset as DManDataset, DatasetStandard, DatasetSpecification
+from datamodels.variables import Variable
+from datamodels.spaces import Space
+from datamodels.parameterizations import Parameterization
+from pman.datamodels.problems import GenerativeModelingProblem
 
 
 activation_fcns_by_key: dict[str, Union[nn.Module, None]] = {

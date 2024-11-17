@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from src.pman.datamodels.problems import ConditionalGenerativeModelingProblem
-from src.datamodels.datasets import Dataset
-from src.mdev.utilities import MDevDataset
-from src.mdev.generative.vae import VAE
-from src.mdev.archspec import *
+from pman.datamodels.problems import ConditionalGenerativeModelingProblem
+from datamodels.datasets import Dataset
+from mdev.utilities import MDevDataset
+from mdev.generative.vae import VAE
+from mdev.archspec import *
 
 
 wd = Path(__file__).parent

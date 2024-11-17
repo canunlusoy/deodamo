@@ -1,6 +1,6 @@
 from collections import UserDict
 
-from src.datamodels.variables import SamplingVariable
+from datamodels.variables import SamplingVariable
 
 
 class Point(UserDict):

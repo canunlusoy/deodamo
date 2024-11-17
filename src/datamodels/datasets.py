@@ -6,10 +6,10 @@ from dataclasses import dataclass, field
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from src.datamodels.analyses import AnalysisStandard
-from src.datamodels.parameterizations import Parameterization
+from datamodels.analyses import AnalysisStandard
+from datamodels.parameterizations import Parameterization
 
-from src.datamodels.variables import Variable
+from datamodels.variables import Variable
 from utils.iox import ProgramData
 
 

@@ -2,11 +2,11 @@ from pathlib import Path
 
 import torch
 
-from src.datamodels.datasets import Dataset
+from datamodels.datasets import Dataset
 
-from src.mdev.generative.base import TrainingProgressPlotter
-from src.mdev.generative.gan import CWGANGP, GANValidatorBundle
-from src.mdev.utilities import MDevDataset, split_into_train_test
+from mdev.generative.base import TrainingProgressPlotter
+from mdev.generative.gan import CWGANGP, GANValidatorBundle
+from mdev.utilities import MDevDataset, split_into_train_test
 
 from demos.gmm8.plotter import GMM8GenerationPlotter
 

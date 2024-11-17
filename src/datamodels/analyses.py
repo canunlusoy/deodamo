@@ -1,8 +1,8 @@
 from typing import ClassVar, Type, Any
 from dataclasses import dataclass, field
 
-from src.datamodels.assets import Asset
-from src.datamodels.variables import Metric
+from datamodels.assets import Asset
+from datamodels.variables import Metric
 
 from utils.iox import ProgramData
 

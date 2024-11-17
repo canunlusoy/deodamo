@@ -2,14 +2,13 @@ from pathlib import Path
 
 import torch
 
-from src.datamodels.datasets import Dataset
+from datamodels.datasets import Dataset
 
-from src.mdev.generative.base import TrainingProgressPlotter
-from src.mdev.generative.gan import WGANGP, GANValidatorBundle
-from src.mdev.utilities import MDevDataset, split_into_train_test
-from src.pman.datamodels.problems import GenerativeModelingProblem
+from mdev.generative.base import TrainingProgressPlotter
+from mdev.generative.gan import WGANGP, GANValidatorBundle
+from mdev.utilities import MDevDataset, split_into_train_test
 
-from local.toy_gmm8.plotter import GMM8GenerationPlotter
+from demos.gmm8.plotter import GMM8GenerationPlotter
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

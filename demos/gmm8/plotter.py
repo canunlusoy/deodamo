@@ -4,7 +4,7 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from src.mdev.generative.base import GenerativeModel, ConditionalGenerativeModel, GenerativeModelOutputAdapter, ConditionalGenerativeModelOutputAdapter
+from mdev.generative.base import GenerativeModel, ConditionalGenerativeModel, GenerativeModelOutputAdapter, ConditionalGenerativeModelOutputAdapter
 
 from demos.gmm8.problem import cond_problem, x, y
 

@@ -5,15 +5,15 @@ from dataclasses import dataclass, field
 import numpy as np
 from scipy.stats.qmc import LatinHypercube
 
-from src.datamodels.assets import Asset
-from src.datamodels.mappers import S2SMapper, SympyExpressionMapper
-from src.datamodels.points import DesignSpacePoint, SamplingSpacePoint, AbstractSpacePoint
-from src.datamodels.analyses import PerformanceMetric
-from src.datamodels.variables import (
+from datamodels.assets import Asset
+from datamodels.mappers import S2SMapper, SympyExpressionMapper
+from datamodels.points import DesignSpacePoint, SamplingSpacePoint, AbstractSpacePoint
+from datamodels.analyses import PerformanceMetric
+from datamodels.variables import (
     Variable, ContinuousVariable, DesignVariable, SamplingVariable, ContinuousSamplingVariable, ContinuousDesignVariable
 )
-from src.datamodels.datasets import Dataset, DatasetStandard, DatasetSpecification
-from src.datamodels.parameterizations import Parameterization
+from datamodels.datasets import Dataset, DatasetStandard, DatasetSpecification
+from datamodels.parameterizations import Parameterization
 
 from utils.iox import ProgramData
 from utils.programming import is_lambda_function

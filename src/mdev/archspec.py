@@ -4,7 +4,7 @@ from dataclasses import dataclass, field, asdict, make_dataclass
 import torch
 import torch.nn as nn
 
-from src.utils.iox import ProgramData
+from utils.iox import ProgramData
 
 
 class Layers:

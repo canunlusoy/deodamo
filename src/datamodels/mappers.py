@@ -6,9 +6,9 @@ import numpy as np
 from sympy.parsing.sympy_parser import parse_expr
 from scipy.interpolate import RegularGridInterpolator
 
-from src.utils.iox import ProgramData
-from src.datamodels.points import Point, AbstractSpacePoint
-from src.datamodels.variables import SamplingVariable
+from utils.iox import ProgramData
+from datamodels.points import Point, AbstractSpacePoint
+from datamodels.variables import SamplingVariable
 
 from utils.programming import is_lambda_function
 

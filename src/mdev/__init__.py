@@ -1,5 +1,5 @@
 import logging
-from src.mdev.logger import set_logging_configuration
+from mdev.logger import set_logging_configuration
 
 set_logging_configuration()
 

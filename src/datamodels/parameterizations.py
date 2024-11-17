@@ -1,8 +1,8 @@
 from typing import ClassVar, Type
 from dataclasses import dataclass
 
-from src.datamodels.assets import Asset, DesignAsset
-from src.datamodels.variables import Variable, DesignVariable
+from datamodels.assets import Asset, DesignAsset
+from datamodels.variables import Variable, DesignVariable
 
 from utils.iox import ProgramData
 
