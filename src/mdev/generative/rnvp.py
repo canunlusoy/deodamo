@@ -192,6 +192,7 @@ class CRNVP(ConditionalGenerativeModel):
         model_input = torch.hstack((batch_fts, batch_conds))
 
         x_out, sum_log_det = self.network(model_input)
+        self.last_batch_generated_data = x_out
 
         # Term A: log likelihood
         term_A = (1 / N) * (0.5 * x_out.norm(2, dim=1, keepdim=True).pow(2) - sum_log_det).sum(0)
@@ -291,7 +292,7 @@ class CRNVP(ConditionalGenerativeModel):
             x_j = x
             sum_log_det = torch.zeros((x.shape[0], 1), device=self.device)
 
-            for layer_j in self.coupling_layers:
+            for lindex, layer_j in enumerate(self.coupling_layers):
                 x_j, log_det_j = layer_j(x_j)
                 sum_log_det += log_det_j
 
