@@ -2,7 +2,7 @@ from typing import ClassVar, Type
 from dataclasses import dataclass, field
 
 from datamodels.datasets import DatasetSpecification
-from datamodels.spaces import Space, DesignSpace
+from datamodels.spaces import Space, DesignSpace, PerformanceSpace
 from datamodels.variables import Variable
 from datamodels.parameterizations import DesignParameterization
 from datamodels.assets import DesignAsset
@@ -39,7 +39,7 @@ class OptimizationProblem(Problem):
 class DesignProblem(Problem):
 
     assets_to_design: list[DesignAsset]
-    asset_parameterizations: dict[DesignAsset, Type[DesignParameterization]]
+    asset_parameterizations: dict[DesignAsset, DesignParameterization]
 
     _data_type_str: ClassVar[str] = 'definition:problem:design'
     _data_type_key: ClassVar[int] = 8010
@@ -133,7 +133,7 @@ class ConditionalGenerativeDesignProblem(ConditionalGenerativeModelingProblem, D
     _data_type_key: ClassVar[int] = 8076
 
     _save_fields: ClassVar[list[str]] = GenerativeDesignProblem._save_fields + ['condition_space']
-    _used_classes: ClassVar[list[Type['ProgramData']]] = GenerativeDesignProblem._used_classes + [Space]
+    _used_classes: ClassVar[list[Type['ProgramData']]] = GenerativeDesignProblem._used_classes + [Space, PerformanceSpace]
 
     def get_training_dataset_spec(self) -> 'DatasetSpecification':
         return DatasetSpecification(columns=self.generate_space.variables + self.condition_space.variables)

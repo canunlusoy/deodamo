@@ -345,5 +345,5 @@ class PerformanceSpace(Space):
     _data_type_str: ClassVar[str] = 'definition:space:performance'
     _data_type_key: ClassVar[int] = 560
 
-    _save_fields: ClassVar[list[str]] = ['variables']
+    _save_fields: ClassVar[list[str]] = ['variables', 'associated_assets']
     _used_classes: ClassVar[list[Type['ProgramData']]] = [PerformanceMetric, Asset]

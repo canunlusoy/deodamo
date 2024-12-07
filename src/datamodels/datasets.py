@@ -7,9 +7,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from datamodels.analyses import AnalysisStandard
-from datamodels.parameterizations import Parameterization
+from datamodels.parameterizations import Parameterization, DesignParameterization
 
-from datamodels.variables import Variable
+from datamodels.variables import Variable, DesignVariable
 from utils.iox import ProgramData
 
 
@@ -23,7 +23,7 @@ class DatasetSpecification(ProgramData):
     _data_type_key: ClassVar[int] = 9100
 
     _save_fields: ClassVar[list[str]] = ['columns']
-    _used_classes: ClassVar[list[Type['ProgramData']]] = [Variable]
+    _used_classes: ClassVar[list[Type['ProgramData']]] = [Variable, DesignVariable]
 
     def __eq__(self, other) -> bool:
         """
@@ -46,7 +46,7 @@ class DatasetStandard(ProgramData):
     _data_type_key: ClassVar[int] = 9200
 
     _save_fields: ClassVar[list[str]] = ['specification', 'columns_standards']
-    _used_classes: ClassVar[list[Type['ProgramData']]] = [DatasetSpecification, AnalysisStandard, Parameterization]
+    _used_classes: ClassVar[list[Type['ProgramData']]] = [DatasetSpecification, AnalysisStandard, Parameterization, DesignParameterization]
 
     def __post_init__(self):
         if not isinstance(self.specification, DatasetSpecification):
