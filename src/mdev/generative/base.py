@@ -173,6 +173,8 @@ class GenerativeModel:
         self.current_train_epoch: int = 0
         """Index of current training epoch."""
 
+        self.last_batch_generated_data = None
+
         self.train_dataset_id = None
         """Name of the dataset used for training."""
         self.train_data_groups_means = None
@@ -286,7 +288,7 @@ class GenerativeModel:
         losses_str = ' / '.join([f'{loss_type_name}={loss_value:.04e}' for loss_type_name, loss_value in self._current_epoch_losses.items()])
         logger.log(LOG_LEVEL_TRAINING, f'Epoch {epoch_index:03d}: {losses_str}')
 
-        self._do_end_of_epoch_callbacks(epoch_index, self._current_epoch_losses, None, last_batch_train_data)
+        self._do_end_of_epoch_callbacks(epoch_index, self._current_epoch_losses, last_batch_train_data, self.last_batch_generated_data)
 
     def _train_batch(self, batch_index: int, batch_data: tuple[torch.Tensor, ...]):
         """Process one (mini)batch of training data and update the network using loss based on the batch."""
