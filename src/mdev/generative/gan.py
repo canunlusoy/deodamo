@@ -381,6 +381,7 @@ class GAN(GenerativeModel):
     def loss_generator(self, batch_fts: torch.Tensor) -> torch.Tensor:
 
         g_out = self._get_generator_outputs(n_samples=batch_fts.shape[0])
+        self.last_batch_generated_data = g_out
 
         # Discriminator output for fake data (data from generator)
         d_out_fake = self._get_discriminator_outputs(g_out)
@@ -744,6 +745,7 @@ class CGAN(GAN, ConditionalGenerativeModel):
             raise Exception()
 
         g_out = self._get_generator_outputs(batch_conds)
+        self.last_batch_generated_data = g_out
 
         # Discriminator output for fake data (data from generator)
         d_out_fake = self._get_discriminator_outputs(g_out, batch_conds)

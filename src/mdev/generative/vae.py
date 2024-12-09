@@ -190,6 +190,7 @@ class VAE(GenerativeModel):
 
         # Decoding
         x_reconstruction = self.decoder.decode(z)
+        self.last_batch_generated_data = x_reconstruction
 
         # Calculate ELBO
         re_multipler = self.hps.loss_reconstruction_multiplier  # alias

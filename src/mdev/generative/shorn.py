@@ -358,6 +358,7 @@ class SHORN(GenerativeModel):
     def loss_generator(self, batch_fts: torch.Tensor) -> torch.Tensor:
 
         g_out = self._get_generator_outputs(n_samples=batch_fts.shape[0])
+        self.last_batch_generated_data = g_out
 
         loss_sinkhorn = self.get_sinkhorn_div(
             real_fts=batch_fts,
@@ -478,6 +479,7 @@ class CSHORN(SHORN, ConditionalGenerativeModel):
             raise Exception(message)
 
         g_out = self._get_generator_outputs(batch_conds)
+        self.last_batch_generated_data = g_out
 
         loss_sinkhorn = self.get_sinkhorn_div(
             real_fts=batch_fts,
